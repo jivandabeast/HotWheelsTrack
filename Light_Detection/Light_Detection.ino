@@ -5,12 +5,20 @@
  *  
  */
 
-int startVal;
-int trigVal; 
+int startBotVal;
+int trigBotVal; 
+
+int startTopVal;
+int trigTopVal;
+
+unsigned long startTime;
+unsigned long endTime;
+unsigned long elapsedTime;
 
 void setup() {
   Serial.begin(9600);
-  startVal = analogRead(A0);
+  startTopVal = analogRead(A1);
+  startBotVal = analogRead(A0);
   Serial.println("Clear Output");
   delay(1000);
   Serial.println("3");
@@ -20,20 +28,33 @@ void setup() {
   Serial.println("1");
   delay(1000);
   
-  Serial.println(startVal);
   pinMode(2, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(6, OUTPUT);
   digitalWrite(2, LOW);
+  digitalWrite(4, LOW);
+  digitalWrite(6, LOW);
 
-  trigVal = (0.75 * startVal);
-  Serial.println(trigVal);
+  trigTopVal = (0.75 * startTopVal);
+  trigBotVal = (0.75 * startBotVal);
+
+  digitalWrite(6, HIGH);
 }
 
 
 void loop() {
-  int value = analogRead(A0);
-  if (value <= trigVal) {
+  int botValue = analogRead(A0);
+  int topValue = analogRead(A1);
+  if (botValue <= trigBotVal) {
     digitalWrite(2, HIGH);
-    Serial.println(value);
+    endTime = millis();
+
+    elapsedTime = (endTime - startTime);
+    elapsedTime = (elapsedTime / 1000);
+    Serial.println(elapsedTime);
   }
-  //Serial.println(value);
+  if (topValue <= trigTopVal) {
+    digitalWrite(4, HIGH);
+    startTime = millis();
+  }
 }
