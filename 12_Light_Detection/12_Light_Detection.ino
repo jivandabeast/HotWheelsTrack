@@ -17,12 +17,12 @@ int botVal[6] = {};
 int trigTopVal[6] = {};
 int trigBotVal[6] = {};
 
-unsigned long startTime = 0;
-unsigned long endTime = 0;
-unsigned long elapsedTime = 0;
+unsigned long startTime[6] = {};
+unsigned long endTime[6] = {};
+unsigned long elapsedTime[6] = {};
 
-boolean topTrig = true;
-boolean botTrig = true;
+boolean topTrig[6] = {true, true, true, true, true, true};
+boolean botTrig[6] = {true, true, true, true, true, true};
 
 void setup() {
   Serial.begin(9600);
@@ -55,23 +55,26 @@ void setup() {
 
 
 void loop() {
-  int botValue = analogRead(A6);
-  int topValue = analogRead(A0);
-  if ((botValue <= trigBotVal[0]) && (botTrig)) {
-    digitalWrite(3, HIGH);
-    botTrig = false;
-    endTime = millis();
+  for (int i = 0; i < 6; i += 1) {
+    int topValue = analogRead(topPho[i]);
+    int botValue = analogRead(botPho[i]);
 
-    elapsedTime = (endTime - startTime);
-    elapsedTime = (elapsedTime / 1000);
-    Serial.println(elapsedTime);
-
-    Serial.println("Triggered bottom photoresistor");
-  }
-  if ((topValue <= trigTopVal[0]) && (topTrig)) {
-    digitalWrite(4, HIGH);
-    topTrig = false;
-    startTime = millis();
-    Serial.println("Triggered top photoresistor");
+    if ((topValue <= trigTopVal[i]) && (topTrig[i])) {
+      startTime[i] = millis();
+      topTrig[i] = false;
+    }
+    if ((botValue <= trigBotVal[i]) && (botTrig[i])) {
+      digitalWrite(lightPin[i], HIGH);
+      endTime[i] = millis();
+      elapsedTime[i] = (endTime[i] - startTime[i]);
+      elapsedTime[i] = (elapsedTime[i] / 1000);
+      Serial.println();
+      Serial.print("Lane ");
+      Serial.print(i);
+      Serial.print(" finished with a time of ");
+      Serial.print(elapsedTime[i]);
+      Serial.println(" !");
+      botTrig[i] = false;
+    }
   }
 }
