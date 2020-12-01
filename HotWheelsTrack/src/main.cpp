@@ -14,9 +14,7 @@ const char lightPin[] = {3, 4, 5, 6, 7, 8, 2};
 const char topPho[] = {A0, A1, A2, A3, A4, A5};
 const char botPho[] = {A6, A7, A8, A9, A10, A11};
 
-// const int lanes = 6;
-// int sortList[lanes] = {5, 6, 4, 1, 3, 2};
-
+const int lanes = 6;
 
 int topVal[6] = {};
 int botVal[6] = {};
@@ -24,13 +22,17 @@ int botVal[6] = {};
 int trigTopVal[6] = {};
 int trigBotVal[6] = {};
 
+int finTrack = 0; 
+int finalScore[6] = {};
+
 unsigned long startTime[6] = {};
 unsigned long endTime[6] = {};
 unsigned long elapsedTime[6] = {};
 
+int milliSeconds[6] = {};
+
 boolean topTrig[6] = {true, true, true, true, true, true};
 boolean botTrig[6] = {false, false, false, false, false, false};
-boolean finTrack[6] = {false, false, false, false, false, false};
 
 void setup() {
   Serial.begin(9600);
@@ -60,11 +62,6 @@ void setup() {
   Serial.println();
   digitalWrite(lightPin[6], HIGH);
 
-  // delay(1000);
-  // KickSort<int>::quickSort(sortList, lanes, KickSort_Dir::DESCENDING);
-  // for (int i = 0; i < lanes; i += 1) {
-  //   Serial.println(sortList[i]);
-  // }
 }
 
 
@@ -82,7 +79,7 @@ void loop() {
       digitalWrite(lightPin[i], HIGH);
       endTime[i] = millis();
       elapsedTime[i] = (endTime[i] - startTime[i]);
-      elapsedTime[i] = (elapsedTime[i] / 1000);
+      // elapsedTime[i] = (elapsedTime[i] / 1000);
       Serial.println();
       Serial.print("Lane ");
       Serial.print(i);
@@ -90,10 +87,28 @@ void loop() {
       Serial.print(elapsedTime[i]);
       Serial.println(" !");
       botTrig[i] = false;
-      finTrack[i] = true;
-      if ((finTrack[0] == true) && (finTrack[1] == true) && (finTrack[2] == true) && (finTrack[3] == true) && (finTrack[4] == true) && (finTrack[5] == true)) {
+      finTrack += 1;
+      milliSeconds[i] = elapsedTime[i];
+      if (finTrack == 6) {
         Serial.println();
-        Serial.println("Its over");
+        KickSort<int>::quickSort(milliSeconds, lanes, KickSort_Dir::ASCENDING);
+        for (int i = 0; i < lanes; i += 1) {
+          int t = milliSeconds[i];
+          for (int n = 0; n < lanes; n += 1) {
+            if (t == elapsedTime[n]) {
+              Serial.print("Lane ");
+              Serial.print(n);
+              Serial.print(" finished in ");
+              int p = (i + 1);
+              Serial.print(p);
+              Serial.print(" Place, with a time of ");
+              Serial.print(t);
+              Serial.print(" !");
+              Serial.println();
+            }
+          }
+          // Serial.println(milliSeconds[i]);
+        }
       }
     }
   }
