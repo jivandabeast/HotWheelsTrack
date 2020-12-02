@@ -64,7 +64,6 @@ void setup() {
 
 }
 
-
 void loop() {
   for (int i = 0; i < 6; i += 1) {
     int topValue = analogRead(topPho[i]);
@@ -107,7 +106,6 @@ void loop() {
               Serial.println();
             }
           }
-          // Serial.println(milliSeconds[i]);
         }
       }
     }
