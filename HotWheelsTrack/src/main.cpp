@@ -15,8 +15,9 @@ const char lightPin[] = {3, 4, 5, 6, 7, 8, 2};
 const char topPho[] = {A0, A1, A2, A3, A4, A5};
 const char botPho[] = {A6, A7, A8, A9, A10, A11};
 
-// Pins that the 7 segment displays are connected to
-const char dispPin[] = {};
+const char latchPin = 11; 
+const char clockPin = 12;
+const char dataPin = 10;
 
 const int lanes = 6;
 
@@ -35,6 +36,8 @@ unsigned long endTime[6] = {};
 unsigned long elapsedTime[6] = {};
 
 int milliSeconds[6] = {};
+
+int trackPlace[6] = {};
 
 // Booleans for keeping track of which lanes have been started/finished
 boolean topTrig[6] = {true, true, true, true, true, true};
@@ -67,6 +70,10 @@ void setup() {
     trigTopVal[i] = (0.75 * topVal[i]);
     trigBotVal[i] = (0.75 * botVal[i]);
   }
+
+  pinMode(latchPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
 
   // Activate ready signal
   Serial.println();
@@ -123,9 +130,42 @@ void loop() {
               Serial.print(t);
               Serial.print(" !");
               Serial.println();
+
+              trackPlace[n] = p; 
             }
           }
         }
+        digitalWrite(latchPin, LOW);
+
+        // byte outVar = 0b00000000;
+        // byte varOne = 0b0101;
+        // byte varTwo = 0b0101;
+
+        byte varOne = trackPlace[5];
+        byte varTwo = trackPlace[4];
+        byte outVar = (varOne << 4) | varTwo;
+        shiftOut(dataPin, clockPin, MSBFIRST, outVar);
+
+        varOne = trackPlace[3];
+        varTwo = trackPlace[2];
+        outVar = (varOne << 4) | varTwo;
+        shiftOut(dataPin, clockPin, MSBFIRST, outVar);
+
+        // for (int i = 6; i > 0; --i) {
+        //   if (i % 2 == 0) {
+        //     varOne = trackPlace[i];
+        //   } else {
+        //     varTwo = trackPlace[i];
+        //     shiftOut(dataPin, clockPin, MSBFIRST, (varOne << 4) | varTwo);
+        //   }
+        // }
+        
+        varOne = trackPlace[1];
+        varTwo = trackPlace[0];
+        outVar = (varOne << 4) | varTwo;
+        shiftOut(dataPin, clockPin, MSBFIRST, outVar);
+        
+        digitalWrite(latchPin, HIGH);
       }
     }
   }
